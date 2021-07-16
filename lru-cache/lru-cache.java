@@ -1,7 +1,7 @@
 class DLLNode{
     int key, val;
-    DLLNode prev, next;
-    DLLNode(int key, int val){
+    DLLNode next, prev;
+    public DLLNode(int key, int val){
         this.key = key;
         this.val = val;
     }
@@ -10,43 +10,63 @@ class LRUCache {
     HashMap<Integer, DLLNode> map;
     DLLNode head, tail;
     int capacity;
-    private void insert(DLLNode node){
-        map.put(node.key, node);
-        node.next = head.next;
-        node.next.prev = node;
-        node.prev = head;
-        head.next = node;
-    }
-    private void remove(DLLNode node){
-        map.remove(node.key);
-        node.prev.next = node.next;
-        node.next.prev = node.prev;
-    }
     public LRUCache(int capacity) {
-        this.capacity = capacity;
-        map = new HashMap();
+        map = new HashMap<>();
         head = new DLLNode(-1, -1);
         tail = new DLLNode(-1, -1);
         head.next = tail;
         tail.prev = head;
+        this.capacity = capacity;
     }
     
     public int get(int key) {
+        if(!map.containsKey(key)) return -1;
         DLLNode node = map.get(key);
-        if(node == null) return -1;
-        remove(node);
-        insert(node);
-        return map.get(key).val;
+        removeNode(node);
+        insertNode(node);
+        return node.val;
     }
     
     public void put(int key, int value) {
+        if(!map.containsKey(key) && capacity <= map.size()){
+            removeLast();
+        }
         if(map.containsKey(key)){
-            remove(map.get(key));
+            DLLNode node = map.get(key);
+            node.val = value;
+            removeNode(node);
+            insertNode(node);
         }
-        if(map.size() == capacity){
-            remove(tail.prev);
+        else{
+            DLLNode node = new DLLNode(key, value);
+            map.put(key, node);
+            insertNode(node);
         }
-        insert(new DLLNode(key, value));
+    }
+    private void removeLast(){
+        DLLNode last = tail.prev;
+        tail.prev = last.prev;
+        tail.prev.next = tail;
+        
+        map.remove(last.key);
+    }
+    private void removeNode(DLLNode node){
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+        
+    }
+    private void insertNode(DLLNode node){
+        DLLNode next = head.next;
+        head.next = node;
+        node.next = next;
+        node.prev = head;
+        next.prev = node;
     }
 }
 
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
