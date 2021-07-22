@@ -1,39 +1,30 @@
 class Solution {
-    private void fillLPS(int[] lps, String pattern){
-        lps[0] = 0;
-        int j = 0, i = 1;
-        while(i < pattern.length()){
-            if(pattern.charAt(i) == pattern.charAt(j)){
-                lps[i] = j+1;
-                i++;
-                j++;
+    public int strStr(String haystack, String needle) {
+        if(needle.length() == 0) return 0;
+        int n = needle.length(), hash = 0, mod = 100003;
+        int pow = 1;
+        //compute hash of needle
+        for(int i = 0; i < needle.length(); i++){
+            hash = (hash*26 + needle.charAt(i)) % mod;
+            pow = (pow*26) % mod;
+        }
+
+        //Check hash of every window of size n in haystack
+        int curr_hash = 0;
+        for(int i = 0; i < haystack.length(); i++){
+            curr_hash = (curr_hash*26 + haystack.charAt(i)) % mod;
+            if(i + 1 < n) continue;
+            if(i >= n){
+                curr_hash = curr_hash - (pow*(haystack.charAt(i - n)))% mod;
+                if(curr_hash < 0) curr_hash += mod;
             }
-            else{
-                if(j != 0) j = lps[j-1];
-                else i++;
+            if(curr_hash == hash){
+                if(haystack.substring(i - n + 1, i+1).equals(needle)){
+                   return i - n + 1;  
+                }  
             }
         }
-    }
-    public int strStr(String text, String pattern) {
-        int m = text.length(), n = pattern.length();
-        if(n == 0) return 0;
         
-        int[] lps = new int[n];
-        fillLPS(lps, pattern);
-        
-        //KMP
-        int i = 0, j = 0;
-        while(i < text.length() && j < pattern.length()){
-            if(text.charAt(i) == pattern.charAt(j)){
-                i++;
-                j++;
-            }
-            else{
-                if(j == 0) i++;
-                else j = lps[j-1];
-            }
-        }
-        if(j != pattern.length()) return -1;
-        return i - pattern.length();
+        return -1;
     }
 }
