@@ -1,6 +1,6 @@
 /*
-  O(NK): dp[i] will store the maximum score to reach till i
-         It can be observed that for every window of size k, we need the maximum. So this problem is similar to sliding window maximum       
+  APPROACH 1: DP-O(NK)
+  APPROACH 2: Sliding Window-O(N): It can be observed that for every window of size k, we need the maximum. So this problem is similar to sliding window maximum       
 */
 class Solution {
     public int maxResult(int[] nums, int k) {
